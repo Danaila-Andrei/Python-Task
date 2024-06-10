@@ -1,0 +1,41 @@
+The difference between running with and without cache is that in the case of cache implementation, the time is shorter than when we did not implement cache
+For files in which there are fewer elements, we do not notice a visible difference, but when using larger files, we will notice the difference.
+The time may also differ depending on the capacity I have set for the cache.
+Exemple for a matrix with 500.000
+	Timp de executie fara cache: 31.282512664794922  secunde
+	Timp de executie cu cache: 29.806880712509155 secunde
+Exemple for a matrix with 300.000
+Execution time without cache: 7.683815956115723 seconds
+Execution time with cache: 7.924098253250122 seconds
+We notice that the difference is almost imperceptible without the first example;
+
+I also modified the matrix generation function that will generate 10% duplicates
+def generare_matrice(num_matrices, min_rows, max_rows, min_cols, max_cols, duplicate_ratio=0.1):
+    matrices = []
+    with open('mat.in.py', 'w') as file:
+        for _ in range(num_matrices):
+            rows = random.randint(min_rows, max_rows)
+            cols = random.randint(min_cols, max_cols)
+            matrix = [[random.choice(['0', '1']) for _ in range(cols)] for _ in range(rows)]
+            matrices.append((rows, cols, matrix))
+
+        num_duplicates = int(num_matrices * duplicate_ratio)
+        for _ in range(num_duplicates):
+            matrix = random.choice(matrices)
+            matrices.append(matrix)
+
+        for rows, cols, matrix in matrices:
+            file.write(f"{rows}x{cols}:")
+            for row in matrix:
+                file.write(''.join(row))
+            file.write('\n')
+
+
+
+generare_matrice(300000, 5, 10, 5, 10, duplicate_ratio=0.1)
+
+In cacheless processing, each array in the input file is processed independently, for each line in the file, the function process_array(sizes, array_str) is called. The function process_array takes the size of the array and the array as a string and converts it back to a matrix.
+
+In cached processing, the results of matrix processing are stored in a cache to reduce execution time.
+When processing a new array, it first checks if the processing results of that array already exist in the cache. If so, they are returned directly from the cache.
+If the results are not found in the cache, the array is processed as in the no-cache case, and the results are cached for later use.
